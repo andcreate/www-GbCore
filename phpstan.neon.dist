@@ -1,0 +1,26 @@
+# PHPStan 設定 (GbCore)
+#
+# 他の GB プラグインの雛形 (level 5 + szepeviktor/phpstan-wordpress) とは意図的に違う。
+#
+# 【WordPress スタブを入れない】
+# GbCore は WordPress を知らないことが不変条件なので、WP のスタブを入れない。
+# 結果として wp_* / WP_* を書いた瞬間に「未定義」で落ちる。
+# レイヤ違反をレビューではなく CI が機械的に止める。
+#
+# 【level 9】
+# 依存ゼロ・WP の緩い型定義と戦う必要が無いため、雛形の level 5 まで下げる理由が無い。
+# ベースラインは持たない。ここで凍結が必要になるのは、入れるべきでないものが
+# 入った時だけである。
+
+parameters:
+    level: 9
+
+    paths:
+        - src
+
+    excludePaths:
+        analyseAndScan:
+            - vendor (?)
+
+    # WP の PHPDoc 起因の誤検知が無いため、他プラグインと違い PHPDoc を信頼できる。
+    treatPhpDocTypesAsCertain: true

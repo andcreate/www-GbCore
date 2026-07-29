@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<ruleset name="GB Security">
+    <description>
+        セキュリティスニフのみ。整形は phpcs.xml.dist (PSR-12) が担当する。
+
+        【なぜ WPCS をまるごと当てないのか】
+        WordPress-Extra や WordPress-Docs には Yoda 条件・ファイル名規約・
+        プレフィックス規約が含まれ、本プロジェクトの PSR-12 優先方針と
+        正面衝突する。衝突するルールを混ぜると「無視してよい指摘」が大量に出て、
+        本物のセキュリティ指摘まで一緒に無視されるようになる。
+
+        【担当範囲】
+        このルールセットが検出するのは「あるべき処理が無い」型の欠陥
+        (サニタイズ漏れ・エスケープ漏れ・nonce 未検証・prepare 未使用)。
+        「処理はあるが前提が破れている」型は Semgrep が担当する。
+
+        【GbCore での位置づけ】
+        GbCore は WordPress を知らないため、本ルールセットは常に無検出であるべき。
+        ここで何かが検出されたら、入れてはいけないものが入った合図になる。
+    </description>
+
+    <file>.</file>
+
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+    <!-- colors / progress は checkstyle XML を壊すため入れない (phpcs.xml.dist 参照) -->
+    <arg value="s"/>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/languages/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
+    <exclude-pattern>*/e2e/*</exclude-pattern>
+    <!-- テストは未サニタイズの入力を意図的に作るため対象外 -->
+    <exclude-pattern>*/tests/*</exclude-pattern>
+
+    <!-- 対応 WP バージョン。これ未満の後方互換チェックを抑止する -->
+    <config name="minimum_wp_version" value="6.4"/>
+
+    <!--
+        エスケープ・サニタイズ・nonce・リダイレクト・ファイル操作。
+        WordPress.Security.EscapeOutput / NonceVerification /
+        ValidatedSanitizedInput / SafeRedirect / PluginMenuSlug を含む。
+    -->
+    <rule ref="WordPress.Security">
+        <!--
+            ExceptionNotEscaped は除外する。
+
+            このスニフは「テンプレートに echo する」前提で作られており、
+            throw new X("... $var ...") の中の変数まで「エスケープされていない出力」
+            とみなす。GB プラグインの例外は REST 層で捕捉されて JSON に
+            シリアライズされるため、HTML として出力されることはない。
+
+            除外しないと正しいコードが恒久的に赤くなり、ルールセット全体が
+            無視されるようになる (2026-07-29 に実測で 4 件検出)。
+            例外メッセージを画面にそのまま出す設計に変えるなら、この除外を外すこと。
+        -->
+        <exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
+    </rule>
+
+    <!-- $wpdb->prepare() の未使用・プレースホルダ誤用 -->
+    <rule ref="WordPress.DB.PreparedSQL"/>
+    <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
+</ruleset>

@@ -1,0 +1,30 @@
+{
+  "name": "andcreate/gbcore",
+  "description": "GbCore: 依存ゼロ・WordPress 非依存の時刻値オブジェクトとスケジューリング契約",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "GbCore\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "GbCore\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit --colors=always",
+    "analyse": "phpstan analyse --no-progress"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

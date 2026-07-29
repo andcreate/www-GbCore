@@ -1,0 +1,19 @@
+# 中身は andcreate/.github の共有 workflow に委譲する。
+# ルールの変更は andcreate/.github 側だけを直せば全リポジトリに一斉に効く。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # 手動実行の逃げ道。作業ブランチに push しただけでは何も走らないため。
+  # 【注意】GitHub の仕様上、この選択肢が UI / gh workflow run に現れるのは
+  # ワークフローファイルが **デフォルトブランチ (main)** に存在する場合のみ。
+  # 作業ブランチに追加しただけでは使えない。
+  workflow_dispatch:
+
+jobs:
+  gb:
+    # sibling-repos は指定しない。GbCore は依存ゼロであり、
+    # ここに何かを足したくなった時点で設計が壊れている。
+    uses: andcreate/.github/.github/workflows/gb-plugin-ci.yml@main

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<ruleset name="GB PSR-12">
+    <description>
+        整形規約: PSR-12。
+        WP コーディング標準と衝突したら PSR-12 を優先する。
+        セキュリティスニフは phpcs-security.xml.dist に分離している (2 本立て)。
+    </description>
+
+    <file>.</file>
+
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+    <!--
+        colors と p (progress) は入れてはいけない。
+        CI は checkstyle レポートを cs2pr にパイプするが、進捗ドットと
+        ANSI エスケープが XML の前に混ざって出力を壊し、cs2pr が exit 2 で落ちる。
+        「コードに問題がある」ように見えて実際はレポートが機械可読でないだけ、
+        という最も紛らわしい失敗になる (2026-07-29 に実際に踏んだ)。
+
+        なおこのコメント内に連続ハイフンを書かないこと。XML の仕様で禁止されており、
+        ruleset そのものが「not valid」で読めなくなる (これも同日に踏んだ)。
+
+        s = 違反したスニフ名を表示。除外設定を書くときに要るので残す。
+    -->
+    <arg value="s"/>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/languages/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
+    <exclude-pattern>*/e2e/*</exclude-pattern>
+
+    <rule ref="PSR12"/>
+
+    <!-- CLAUDE.md: 最大行長 120 文字 -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="120"/>
+            <!-- 0 = ハードリミット無し。長い URL やメッセージで機械的に落とさない -->
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
+
+    <!--
+        PHPUnit のテストメソッドは test_snake_case が慣習で、PSR-1 の camelCase 要求と
+        衝突する。本リポジトリのテストは全てこの形式。除外しないと指摘が
+        意味のないノイズで埋まり、本物の指摘が埋没する。
+    -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+</ruleset>
