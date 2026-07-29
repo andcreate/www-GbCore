@@ -1,0 +1,6 @@
+# 行末は LF に固定する。
+# Windows の core.autocrlf=true でも作業コピーを CRLF にしない。
+#
+# PSR-12 の Generic.Files.LineEndings は "\n" を要求するため、
+# これが無いと Windows で clone しただけで phpcs が全ファイル赤くなる。
+* text=auto eol=lf
