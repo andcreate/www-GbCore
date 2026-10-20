@@ -4,7 +4,9 @@
  * Plugin Name: GbCore
  * Description: スケジューリング系プラグインが共有する時刻値オブジェクトと契約のカーネル。WordPress API に依存しない。
  * Version: 1.0.0
+ * Requires at least: 6.5
  * Requires PHP: 8.1
+ * Update URI: https://github.com/andcreate/www-GbCore
  * Author URI: https://github.com/andcreate
  * License: GPL-2.0-or-later
  * Text Domain: gbcore
